@@ -1,122 +1,129 @@
-/* ==========================
+/* ====================================
    LOADER
-========================== */
+==================================== */
 
 window.addEventListener("load", () => {
 
-    setTimeout(() => {
+const loader =
+document.getElementById("loader");
 
-        document.body.classList.add("loaded");
+if(loader){
 
-    }, 1000);
+setTimeout(() => {
 
-});
+loader.style.opacity = "0";
 
-/* ==========================
-   SCROLL REVEAL
-========================== */
+loader.style.visibility = "hidden";
 
-const revealElements = document.querySelectorAll(
-    ".section, .project-card, .skill-card, .social-card, .experience-card"
-);
+},800);
 
-const revealObserver = new IntersectionObserver(
-    entries => {
-
-        entries.forEach(entry => {
-
-            if(entry.isIntersecting){
-
-                entry.target.classList.add("active");
-
-            }
-
-        });
-
-    },
-    {
-        threshold:0.15
-    }
-);
-
-revealElements.forEach(el => {
-
-    el.classList.add("reveal");
-
-    revealObserver.observe(el);
+}
 
 });
 
-/* ==========================
-   ACTIVE NAVBAR
-========================== */
-
-const sections = document.querySelectorAll("section");
-const navLinks = document.querySelectorAll(".navbar a");
-
-window.addEventListener("scroll", () => {
-
-    let current = "";
-
-    sections.forEach(section => {
-
-        const sectionTop =
-            section.offsetTop - 200;
-
-        if(window.scrollY >= sectionTop){
-
-            current = section.getAttribute("id");
-
-        }
-
-    });
-
-    navLinks.forEach(link => {
-
-        link.classList.remove("active");
-
-        if(
-            link.getAttribute("href") ===
-            `#${current}`
-        ){
-
-            link.classList.add("active");
-
-        }
-
-    });
-
-});
-
-/* ==========================
-   HEADER BLUR
-========================== */
+/* ====================================
+   HEADER SCROLL EFFECT
+==================================== */
 
 const header =
 document.querySelector(".header");
 
 window.addEventListener("scroll", () => {
 
-    if(window.scrollY > 50){
+if(!header) return;
 
-        header.style.backdropFilter =
-        "blur(30px)";
+if(window.scrollY > 50){
 
-        header.style.transform =
-        "translateX(-50%) scale(.98)";
+header.style.background =
+"rgba(11,18,32,.85)";
 
-    }else{
+header.style.borderColor =
+"rgba(255,255,255,.12)";
 
-        header.style.transform =
-        "translateX(-50%) scale(1)";
+}else{
 
-    }
+header.style.background =
+"rgba(11,18,32,.6)";
+
+header.style.borderColor =
+"rgba(255,255,255,.08)";
+
+}
 
 });
 
-/* ==========================
+/* ====================================
+   SMOOTH SCROLL
+==================================== */
+
+document
+.querySelectorAll('a[href^="#"]')
+.forEach(link => {
+
+link.addEventListener("click", e => {
+
+const targetId =
+link.getAttribute("href");
+
+if(targetId === "#") return;
+
+const target =
+document.querySelector(targetId);
+
+if(target){
+
+e.preventDefault();
+
+target.scrollIntoView({
+
+behavior:"smooth",
+block:"start"
+
+});
+
+}
+
+});
+
+});
+
+/* ====================================
+   REVEAL ANIMATION
+==================================== */
+
+const revealElements =
+document.querySelectorAll(
+".section, .project-card, .skill-card, .social-card, .achievement-card, .timeline-item"
+);
+
+const revealObserver =
+new IntersectionObserver(entries => {
+
+entries.forEach(entry => {
+
+if(entry.isIntersecting){
+
+entry.target.classList.add("active");
+
+}
+
+});
+
+},{
+threshold:0.15
+});
+
+revealElements.forEach(el => {
+
+el.classList.add("reveal");
+
+revealObserver.observe(el);
+
+});
+
+/* ====================================
    MOBILE MENU
-========================== */
+==================================== */
 
 const menuBtn =
 document.querySelector(".mobile-menu-btn");
@@ -124,145 +131,131 @@ document.querySelector(".mobile-menu-btn");
 const navbar =
 document.querySelector(".navbar");
 
-if(menuBtn){
+if(menuBtn && navbar){
 
-    menuBtn.addEventListener("click", () => {
+menuBtn.addEventListener("click", () => {
 
-        navbar.classList.toggle("active");
+navbar.classList.toggle("mobile-active");
 
-    });
+});
 
 }
 
-/* ==========================
-   SMOOTH SCROLL
-========================== */
+/* ====================================
+   COUNTER ANIMATION
+==================================== */
 
-document
-.querySelectorAll('a[href^="#"]')
-.forEach(anchor => {
+const counters =
+document.querySelectorAll(
+".stat-item h3, .achievement-card h3"
+);
 
-    anchor.addEventListener("click", function(e){
+const counterObserver =
+new IntersectionObserver(entries => {
 
-        e.preventDefault();
+entries.forEach(entry => {
 
-        const target =
-        document.querySelector(
-            this.getAttribute("href")
-        );
+if(entry.isIntersecting){
 
-        target.scrollIntoView({
+const el = entry.target;
 
-            behavior:"smooth"
+const text = el.innerText;
 
-        });
+const number =
+parseInt(text.replace(/\D/g,""));
 
-    });
+if(!number) return;
+
+let current = 0;
+
+const step =
+Math.ceil(number / 40);
+
+const interval =
+setInterval(() => {
+
+current += step;
+
+if(current >= number){
+
+current = number;
+
+clearInterval(interval);
+
+}
+
+if(text.includes("+")){
+
+el.innerText = current + "+";
+
+}else{
+
+el.innerText = current;
+
+}
+
+},30);
+
+counterObserver.unobserve(el);
+
+}
 
 });
 
-/* ==========================
-   COUNTER ANIMATION
-========================== */
-
-const counters =
-document.querySelectorAll(".counter");
+},{
+threshold:0.5
+});
 
 counters.forEach(counter => {
 
-    const updateCounter = () => {
-
-        const target =
-        +counter.getAttribute("data-target");
-
-        const count =
-        +counter.innerText;
-
-        const increment =
-        target / 80;
-
-        if(count < target){
-
-            counter.innerText =
-            Math.ceil(count + increment);
-
-            setTimeout(updateCounter,20);
-
-        }else{
-
-            counter.innerText =
-            target;
-
-        }
-
-    };
-
-    updateCounter();
+counterObserver.observe(counter);
 
 });
 
-/* ==========================
-   PARALLAX AVATAR
-========================== */
-
-const avatar =
-document.querySelector(".avatar-area");
-
-document.addEventListener(
-    "mousemove",
-    (e) => {
-
-        if(!avatar) return;
-
-        const x =
-        (window.innerWidth / 2 - e.clientX)
-        / 40;
-
-        const y =
-        (window.innerHeight / 2 - e.clientY)
-        / 40;
-
-        avatar.style.transform =
-        `translate(${x}px, ${y}px)`;
-
-    }
-);
-
-/* ==========================
-   FLOATING DOCK EFFECT
-========================== */
+/* ====================================
+   FLOATING DOCK ACTIVE
+==================================== */
 
 const dockItems =
 document.querySelectorAll(".dock-item");
 
 dockItems.forEach(item => {
 
-    item.addEventListener("mouseenter", () => {
+item.addEventListener("mouseenter", () => {
 
-        item.style.transform =
-        "translateY(-8px) scale(1.05)";
-
-    });
-
-    item.addEventListener("mouseleave", () => {
-
-        item.style.transform =
-        "translateY(0) scale(1)";
-
-    });
+item.style.transform =
+"translateX(-8px) scale(1.05)";
 
 });
 
-/* ==========================
-   CONSOLE SIGNATURE
-========================== */
+item.addEventListener("mouseleave", () => {
 
-console.log(
-"%c Aziz Asadov Portfolio",
-"color:#7C3AED;font-size:20px;font-weight:bold;"
-);
+item.style.transform =
+"translateX(0) scale(1)";
 
-console.log(
-"%c AI Builder • Digital Creator",
-"color:#06B6D4;font-size:14px;"
-);
+});
+
+});
+
+/* ====================================
+   PARALLAX AVATAR
+==================================== */
+
+const avatar =
+document.querySelector(".avatar-area");
+
+window.addEventListener("mousemove", e => {
+
+if(!avatar) return;
+
+const x =
+(window.innerWidth / 2 - e.clientX) / 40;
+
+const y =
+(window.innerHeight / 2 - e.clientY) / 40;
+
+avatar.style.transform =
+`translate(${x}px, ${y}px)`;
+
+});
+
